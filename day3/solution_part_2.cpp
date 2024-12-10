@@ -3,33 +3,35 @@
 #include <vector>
 #include <string>
 #include <cctype>
+#include <unordered_map>
 
 using namespace std;
 
 class EngineSchematicAnalyzer {
 	private:
 		vector<string> schematic;
+		unordered_map<string, vector<int>> gearParts;
 
-		bool isSymbol(char c) {
-			return c != '.' && !isdigit(c);
+		string coordToKey(int row, int col) {
+			return to_string(row) + "," + to_string(col);
 		}
 
-		bool isPartNumber(int row, int startCol, int endCol) {
+		void checkAdjacentGears(int row, int startCol, int endCol, int number) {
 			int minRow = max(0, row - 1);
 			int maxRow = min(static_cast<int>(schematic.size()) - 1, row + 1);
 			int minCol = max(0, startCol - 1);
 			int maxCol = min(static_cast<int>(schematic[0].length()) - 1, endCol + 1);
 
-			for(int r = minRow; r <= maxRow; ++r) {
-				for(int c = minCol; c <= maxCol; ++c) {
+			for (int r = minRow; r <= maxRow; ++r) {
+				for (int c = minCol; c <= maxCol; ++c) {
 					if (r == row && c >= startCol && c <= endCol) continue;
 
-					if (isSymbol(schematic[r][c])) {
-						return true;
+					if (schematic[r][c] == '*') {
+						string gearKey = coordToKey(r, c);
+						gearParts[gearKey].push_back(number);
 					}
 				}
 			}
-			return false;
 		}
 
 	public:
@@ -41,6 +43,7 @@ class EngineSchematicAnalyzer {
 			}
 
 			schematic.clear();
+			gearParts.clear();
 			string line;
 			while(getline(file, line)) {
 				schematic.push_back(line);
@@ -48,26 +51,33 @@ class EngineSchematicAnalyzer {
 			return true;
 		}
 
-		int calculatePartNumberSum() {
-			int sum = 0;
+		int calculateGearRatioSum() {
 			for(int row = 0; row < schematic.size(); ++row) {
 				for(int col = 0; col < schematic[row].length(); ++col) {
 					if (isdigit(schematic[row][col])) {
 						int startCol = col;
 						int number = 0;
-						while (col < schematic[row].length() && isdigit(schematic[row][col])) {
+						while(col < schematic[row].length() && isdigit(schematic[row][col])) {
 							number = number * 10 + (schematic[row][col] - '0');
 							col++;
 						}
-						if (isPartNumber(row, startCol, col - 1)) {
-							sum += number; 
-						}
+
+						checkAdjacentGears(row, startCol, col - 1, number);
 
 						col--;
 					}
 				}
 			}
-			return sum;
+
+			int totalGearRatioSum = 0;
+			for (const auto& [gear, parts] : gearParts) {
+				if (parts.size() == 2) {
+					totalGearRatioSum += parts[0] * parts[1];
+				}
+			}
+
+			return totalGearRatioSum;
+
 		}
 };
 
@@ -75,8 +85,8 @@ int main() {
 	EngineSchematicAnalyzer analyzer;
 
 	if (analyzer.loadSchematic("input.txt")) {
-		int result = analyzer.calculatePartNumberSum();
-		cout << "The sum of part numbers is: " << result << endl;
+		int result = analyzer.calculateGearRatioSum();
+		cout << "Sum of gear ratios is: " << result << endl;
 	}
 
 	return 0;
