@@ -1,9 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <string>
-#include <cmath>
 
 using namespace std;
 
