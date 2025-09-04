@@ -1,66 +1,46 @@
-#include <iostream>
 #include <fstream>
-#include <string>
+#include <iostream>
+#include <regex>
 
 using namespace std;
 
 int main() {
+  ifstream file("input.txt");
+  string content;
+  string line;
 
-	fstream file("input.txt");
-	if (!file) {
-		cerr << "File not found" << endl;
-		return 1;
-	}
+  while (getline(file, line)) {
+    content += line;
+  }
+  file.close();
 
-	string line;
-	long long total = 0;
+  // Regex pattern to match mul(X,Y), do(), and don't()
+  regex pattern(R"(mul\((\d{1,3}),(\d{1,3})\)|do\(\)|don't\(\))");
 
-	while(getline(file, line)) {
-		bool multiply_enabled = false;
-		size_t pos = 0;
+  bool enabled = true;
+  long long total = 0;
 
-		while(pos < line.length()) {
-			if (pos + 4 <= line.length() && line.substr(pos, 4) == "do()") {
-				multiply_enabled = true;
-				pos += 4;
-				continue;
-			}
+  // Find all matches
+  sregex_iterator iter(content.begin(), content.end(), pattern);
+  sregex_iterator end;
 
-			if (pos + 6 <= line.length() && line.substr(pos, 6) == "don't()") {
-				multiply_enabled = false;
-				pos += 6;
-				continue;
-			}
+  for (; iter != end; ++iter) {
+    const smatch &match = *iter;
+    string matched = match.str();
 
-			if (pos + 4 <= line.length() && line.substr(pos, 4) == "mul(") {
-				size_t end_pos = line.find(")", pos);
-				if (end_pos != string::npos) {
-					string mul_str = line.substr(pos + 4, end_pos - (pos + 4));
-					size_t comma_pos = mul_str.find(",");
-					if (comma_pos != string::npos) {
-						string num1_str = mul_str.substr(0, comma_pos);
-						string num2_str = mul_str.substr(comma_pos + 1);
+    if (matched == "do()") {
+      enabled = true;
+    } else if (matched == "don't()") {
+      enabled = false;
+    } else if (matched.substr(0, 3) == "mul" && enabled) {
+      // Extract the two numbers
+      int x = stoi(match[1].str());
+      int y = stoi(match[2].str());
+      total += (long long)x * y;
+    }
+  }
 
-						bool valid = true;
-						for (char c : num1_str) if (!isdigit(c)) valid = false;
-						for (char c : num2_str) if (!isdigit(c)) valid = false;
-						if (num1_str.length() > 3 || num2_str.length() > 3) valid = false;
-						if (num1_str.empty() || num2_str.empty()) valid = false;
+  cout << "Total: " << total << endl;
 
-						if (valid && multiply_enabled) {
-							int x = stoi(num1_str);
-							int y = stoi(num2_str);
-							total += x * y;
-						}
-						pos = end_pos + 1;
-						continue;
-					}
-				}
-			}
-			pos++;
-		}
-	}
-
-	cout << total << endl;
-	return 0;
+  return 0;
 }
