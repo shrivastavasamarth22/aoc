@@ -18,7 +18,6 @@ struct Position {
   }
 };
 
-// Directions: up, right, down, left
 int dr[] = {-1, 0, 1, 0};
 int dc[] = {0, 1, 0, -1};
 
@@ -27,27 +26,22 @@ int calculateTrailheadRating(const vector<string> &map, int startRow,
   int rows = map.size();
   int cols = map[0].size();
 
-  // Use DFS to count all distinct paths to height 9
   function<int(int, int, int)> dfs = [&](int row, int col,
                                          int expectedHeight) -> int {
-    // Check bounds
     if (row < 0 || row >= rows || col < 0 || col >= cols) {
       return 0;
     }
 
     int currentHeight = map[row][col] - '0';
 
-    // Check if this position has the expected height
     if (currentHeight != expectedHeight) {
       return 0;
     }
 
-    // If we reached height 9, this is one complete trail
     if (currentHeight == 9) {
       return 1;
     }
 
-    // Count trails from all 4 directions
     int totalTrails = 0;
     for (int dir = 0; dir < 4; dir++) {
       int newRow = row + dr[dir];
@@ -90,7 +84,6 @@ int main() {
   }
   cout << endl;
 
-  // Find all trailheads (positions with height 0)
   vector<Position> trailheads;
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < cols; c++) {
