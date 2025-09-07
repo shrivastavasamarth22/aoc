@@ -1,10 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <queue>
-<<<<<<< HEAD
 #include <set>
-=======
->>>>>>> 91421c5a7b6ddc40fcfa1b4e0009862e2e2f86fd
 #include <string>
 #include <vector>
 
@@ -26,7 +23,6 @@ struct Position {
   }
 };
 
-<<<<<<< HEAD
 struct FenceSegment {
   int row, col;
   int direction;
@@ -48,13 +44,6 @@ struct Region {
   int sides;
   vector<Position> plots;
   set<FenceSegment> fenceSegments;
-=======
-struct Region {
-  char plant;
-  int area;
-  int perimeter;
-  vector<Position> plots;
->>>>>>> 91421c5a7b6ddc40fcfa1b4e0009862e2e2f86fd
 };
 
 int dr[] = {-1, 0, 1, 0};
@@ -64,7 +53,6 @@ bool isValid(int row, int col, int rows, int cols) {
   return row >= 0 && row < rows && col >= 0 && col < cols;
 }
 
-<<<<<<< HEAD
 int countSides(const set<FenceSegment> &fenceSegments) {
   set<FenceSegment> visited;
   int sideCount = 0;
@@ -107,8 +95,6 @@ int countSides(const set<FenceSegment> &fenceSegments) {
   return sideCount;
 }
 
-=======
->>>>>>> 91421c5a7b6ddc40fcfa1b4e0009862e2e2f86fd
 Region findRegion(const vector<string> &garden, vector<vector<bool>> &visited,
                   int startRow, int startCol) {
   int rows = garden.size();
@@ -118,10 +104,6 @@ Region findRegion(const vector<string> &garden, vector<vector<bool>> &visited,
   Region region;
   region.plant = plant;
   region.area = 0;
-<<<<<<< HEAD
-=======
-  region.perimeter = 0;
->>>>>>> 91421c5a7b6ddc40fcfa1b4e0009862e2e2f86fd
 
   queue<Position> q;
   q.push(Position(startRow, startCol));
@@ -134,44 +116,28 @@ Region findRegion(const vector<string> &garden, vector<vector<bool>> &visited,
     region.plots.push_back(current);
     region.area++;
 
-<<<<<<< HEAD
-=======
-    int plotPerimeter = 0;
-
->>>>>>> 91421c5a7b6ddc40fcfa1b4e0009862e2e2f86fd
     for (int dir = 0; dir < 4; dir++) {
       int newRow = current.row + dr[dir];
       int newCol = current.col + dc[dir];
 
       if (!isValid(newRow, newCol, rows, cols) ||
           garden[newRow][newCol] != plant) {
-<<<<<<< HEAD
         region.fenceSegments.insert(
             FenceSegment(current.row, current.col, dir));
-=======
-        plotPerimeter++;
->>>>>>> 91421c5a7b6ddc40fcfa1b4e0009862e2e2f86fd
       } else if (!visited[newRow][newCol]) {
         visited[newRow][newCol] = true;
         q.push(Position(newRow, newCol));
       }
     }
-<<<<<<< HEAD
   }
 
   region.sides = countSides(region.fenceSegments);
 
-=======
-
-    region.perimeter += plotPerimeter;
-  }
->>>>>>> 91421c5a7b6ddc40fcfa1b4e0009862e2e2f86fd
   return region;
 }
 
 int main() {
   ifstream file("input.txt");
-<<<<<<< HEAD
   if (!file.is_open()) {
     cerr << "Error: Could not open input.txt" << endl;
     return 1;
@@ -180,23 +146,16 @@ int main() {
   vector<string> garden;
   string line;
 
-=======
-  vector<string> garden;
-  string line;
->>>>>>> 91421c5a7b6ddc40fcfa1b4e0009862e2e2f86fd
   while (getline(file, line)) {
     garden.push_back(line);
   }
   file.close();
 
-<<<<<<< HEAD
   if (garden.empty()) {
     cerr << "Error: Empty garden map" << endl;
     return 1;
   }
 
-=======
->>>>>>> 91421c5a7b6ddc40fcfa1b4e0009862e2e2f86fd
   int rows = garden.size();
   int cols = garden[0].size();
 
@@ -224,21 +183,12 @@ int main() {
 
   for (size_t i = 0; i < regions.size(); i++) {
     Region &region = regions[i];
-<<<<<<< HEAD
     long long price = (long long)region.area * region.sides;
     totalPrice += price;
 
     cout << "Region " << (i + 1) << ": Plant " << region.plant << ", Area "
          << region.area << ", Sides " << region.sides << ", Price " << price
          << endl;
-=======
-    long long price = (long long)region.area * region.perimeter;
-    totalPrice += price;
-
-    cout << "Region " << (i + 1) << ": Plant " << region.plant << ", Area "
-         << region.area << ", Perimeter " << region.perimeter << ", Price "
-         << price << endl;
->>>>>>> 91421c5a7b6ddc40fcfa1b4e0009862e2e2f86fd
   }
 
   cout << "\nTotal price of fencing all regions: " << totalPrice << endl;
